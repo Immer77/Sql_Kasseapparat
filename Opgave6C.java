@@ -23,7 +23,7 @@ public class Opgave6C {
 
             Connection minConnection;
             minConnection = DriverManager.getConnection(
-                    "jdbc:sqlserver://DESKTOP-C9CSAU4\\SQLExpress;databaseName=KasseApparatDatabase;user=sa;password=Rbh66tvy;");
+                    "jdbc:sqlserver://DESKTOP-C9CSAU4\\SQLExpress;databaseName=KasseApparatDatabase;user=sa;password=;");
 
             String sql = "insert into Orderline values(?,?,?,?)";// preparedStatement
             PreparedStatement prestmt = minConnection.prepareStatement(sql);
