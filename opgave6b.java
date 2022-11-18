@@ -12,7 +12,7 @@ public class Opgave6b {
 
             Connection minConnection;
             minConnection = DriverManager.getConnection(
-                    "jdbc:sqlserver://MSI\\SQLExpress;databaseName=KasseApparatDatabase;user=sa;password=eaggerstunn1;");
+                    "jdbc:sqlserver://MSI\\SQLExpress;databaseName=KasseApparatDatabase;user=sa;password=;");
 
             System.out.print("Indtast produktnavn: ");
             String produktNavn = inLine.readLine();
