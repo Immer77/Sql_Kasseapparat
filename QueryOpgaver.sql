@@ -225,17 +225,23 @@ Create trigger sletTomProduktKategori
        on product
        instead of delete
        as
+       declare @produktetsProduktgruppe as varchar(40)
        declare @produktNr as integer
        set @produktNr = (select productNr from deleted)
+       set @produktetsProduktgruppe = (select title from ProductCategoryProduct where productNr = @produktNr)
        delete from ProductCategoryProduct
        where ProductCategoryProduct.productNr = @produktNr
        delete from Product
        where Product.productNr = @produktNr
-IF not exists (select title from ProductCategoryProduct where title in (select title from ProductCategoryProduct where productNr = @produktNr) )
+IF not exists (select title from ProductCategoryProduct where title = @produktetsProduktgruppe)
        begin
        delete from ProductCategory
-       where ProductCategory.title not in (select ProductCategoryProduct.title from ProductCategoryProduct) 
+       where ProductCategory.title = @produktetsProduktgruppe
        print 'produktet og produktgruppen blev slettet'
+       end
+else
+       begin
+       print 'Produktet blev slettet'
        end
 
 
