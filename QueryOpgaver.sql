@@ -1,5 +1,6 @@
--- Opgave 2
--- a
+/*
+Opgave 2a
+*/
 SELECT Product.productNr, productName, priceValue, S.situationName from Product
 Inner join Price as P
 on P.productNr = Product.productNr
@@ -8,8 +9,9 @@ on S.situationName = P.situationName
 where Product.productNr = 2
 
 
--------------------------------------------------------------------------------------
-
+/*
+Opgave 2b
+*/
 SELECT Sale.saleNumber, SUM(ISNULL(O.fixedPrice, Pri.priceValue * O.amount * (1.0 - Pri.percentDiscount /100.0))) as total from Sale
 Inner join OrderLine as O
 on Sale.saleNumber = O.saleNumber
@@ -23,8 +25,9 @@ where Sale.saleNumber = 12
 GROUP BY Sale.saleNumber
 
 
-
--- c
+/*
+Opgave 2c
+*/
 select PCP.title, PRO.productName, SUM(OL.amount) as 'Number Sold', S.endDate
 from Product PRO
 inner join ProductCategoryProduct PCP
@@ -39,9 +42,9 @@ group by PCP.title, PRO.productName, S.endDate
 having SUM(OL.amount) >= 5 AND MONTH(S.endDate) = 7
 
 
-
---D
--- kan forkortes?
+/*
+Opgave 2d
+*/
 SELECT ProductCategory.title, Pro.productName from ProductCategory
 inner join ProductCategoryProduct as ProCat
 on ProCat.title = ProductCategory.title
@@ -64,7 +67,9 @@ on sit.situationName = Pri.situationName
 WHERE sit.situationName = 'Fredagsbar'
 
 
--- e
+/*
+Opgave 2e
+*/
 SELECT AVG(asset_sums) as gennemsnit
 FROM Sale
 inner JOIN
@@ -80,7 +85,10 @@ group by Sale.saleNumber
 ) inner_query
 on inner_query.saleNumber = Sale.saleNumber
 
--- f
+
+/*
+Opgave 2f
+*/
 select PCP.title, MAX(PRI.priceValue) as 'Max Price'
 from ProductCategoryProduct PCP
 inner join Product PR
@@ -90,7 +98,9 @@ on PR.productNr = PRI.productNr
 group by PCP.title
 
 
--- g
+/*
+Opgave 2g
+*/
 select pc.title, p.productName,pr.priceValue from ProductCategoryProduct pcp
 inner join ProductCategory pc
 on pcp.title = pc.title
@@ -107,8 +117,9 @@ on maxInCategory.title = pc.title
 where MaxInCategory.MaxPris = pr.priceValue
 
 
--- Opgave 3.
--- 3A
+/*
+Opgave 3a
+*/
 GO
 CREATE VIEW antalAfProduktersolgt
 AS
@@ -123,14 +134,13 @@ LEFT JOIN OrderLine
 on OrderLine.priceId = Price.priceId
 GROUP BY ProductCategory.title, Product.productName
 
-
-go
 SELECT * From antalAfProduktersolgt
 
--- 3b
 
+/*
+Opgave 3b
+*/
 GO;
-
 CREATE VIEW SaleOverview 
 AS
 select S.saleNumber, C.personName as Customer, E.personName as Salesman, 
@@ -154,8 +164,9 @@ from SaleOverview
 group by Salesman
 
 
--- Opgave 4.
---a
+/*
+Opgave 4a
+*/
 go
 Create PROC WritePriceList
 @situationName VARCHAR(40)
@@ -169,7 +180,11 @@ WHERE Situation.situationName = @situationName
 Group by Product.productName
 
 exec WritePriceList 'Fredagsbar'
--- b
+
+
+/*
+Opgave 4b
+*/
 go
 CREATE PROCEDURE setDiscountOnProductCategory 
 @percent Integer, 
@@ -182,14 +197,11 @@ where Price.productNr in (select PCP.productNr from ProductCategoryProduct PCP w
 Exec setDiscountOnProductCategory 10, 'Flaskeøl'
 
 
--- 4C
-/* Opgave 4c
-Givet en streng som parameter udskriver navn på alle de medarbejdere og kunder, hvis
-navne starter med den pågældende streng.
+/* 
+Opgave 4c
 */
 go
 Create proc FindPersonMedNavn
---input parameter
 @personName varchar(30)
 as
 Begin
@@ -202,16 +214,15 @@ from Customer c
 where c.personName like @personName + '%'
 End
 
--- KØR proc 4c
 exec FindPersonMedNavn 'Peter'
 
--- DROP proc 4c
 drop proc FindPersonMedNavn
 
--- Opgave 5
--- A
 
--- Testdata til nedenstående
+/*
+Opgave 5a
+*/
+-- Testdata til opgave 5a
 Insert into Product VALUES('Hat', 30,10,'')
 insert into ProductCategory Values('Sjove hatte','Alle mulige sjove hatte')
 Insert into Product VALUES('Hatter', 30,10,'')
@@ -225,19 +236,24 @@ Create trigger sletTomProduktKategori
        on product
        instead of delete
        as
+       declare @produktetsProduktgruppe as varchar(40)
        declare @produktNr as integer
        set @produktNr = (select productNr from deleted)
+       set @produktetsProduktgruppe = (select title from ProductCategoryProduct where productNr = @produktNr)
        delete from ProductCategoryProduct
        where ProductCategoryProduct.productNr = @produktNr
        delete from Product
        where Product.productNr = @produktNr
-IF not exists (select title from ProductCategoryProduct where title in (select title from ProductCategoryProduct where productNr = @produktNr) )
+IF not exists (select title from ProductCategoryProduct where title = @produktetsProduktgruppe)
        begin
        delete from ProductCategory
-       where ProductCategory.title not in (select ProductCategoryProduct.title from ProductCategoryProduct) 
+       where ProductCategory.title = @produktetsProduktgruppe
        print 'produktet og produktgruppen blev slettet'
        end
-
+else
+       begin
+       print 'Produktet blev slettet'
+       end
 
 Drop TRIGGER sletTomProduktKategori
 
@@ -246,7 +262,17 @@ SELECT * From Product
 DELETE From Product
 where productNr = 89
 
--- B
+
+/*
+Opgave 5b
+*/
+-- Testdata til opgave 5b
+INSERT INTO Product VALUES('MOKAI', 30, 10, 'Lidt sjov')
+SELECT * FROM Product
+INSERT into Price VALUES(10,0,90,'Standard')
+SELECT * FRom Price
+INSERT into OrderLine Values(5,null,1,53)
+-----------------------------------------------------------------------------
 GO
 CREATE TRIGGER OpdatereAntal on orderline
 after INSERT
@@ -266,10 +292,3 @@ WHERE productNr = @productNr
 END
 
 drop TRIGGER OpdatereAntal
--- Testdata
-INSERT INTO Product VALUES('MOKAI', 30, 10, 'Lidt sjov')
-SELECT * FROM Product
-INSERT into Price VALUES(10,0,90,'Standard')
-SELECT * FRom Price
-INSERT into OrderLine Values(5,null,1,53)
-
