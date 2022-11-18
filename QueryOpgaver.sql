@@ -237,10 +237,6 @@ IF not exists (select title from ProductCategoryProduct where title in (select t
        where ProductCategory.title not in (select ProductCategoryProduct.title from ProductCategoryProduct) 
        print 'produktet og produktgruppen blev slettet'
        end
-else
-       begin
-       print 'Produktet blev slettet'
-       end
 
 
 Drop TRIGGER sletTomProduktKategori
