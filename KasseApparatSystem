@@ -8,12 +8,14 @@ DROP TABLE ProductCategory
 DROP TABLE Product
 drop table Situation
 
+
 CREATE TABLE Product(
     productNr Int IDENTITY(1,1) PRIMARY KEY,
     productName varchar(40),
     currentAmount int,
-    minimiumamount int,
+    minimiumamount int DEFAULT 10,
     productDescription varchar(100)
+    
 )
 
 CREATE TABLE ProductCategory(
@@ -27,28 +29,30 @@ CREATE TABLE ProductCategoryProduct(
     PRIMARY key (title, productNr)
 )
 
+
 CREATE TABLE Situation(
     situationName VARCHAR(40) PRIMARY KEY,
 )
 
+
 CREATE TABLE Price(   
     priceId INT IDENTITY(1,1) PRIMARY KEY,
     priceValue INT,
-    percentDiscount int,
+    percentDiscount int check (percentDiscount>=0 and percentDiscount<=100),
     productNr int FOREIGN KEY REFERENCES Product(productNr) not null,
     situationName VARCHAR(40) FOREIGN KEY REFERENCES Situation(situationName) not null,
 )
 
 CREATE TABLE Employee(
     employeeId int IDENTITY(1,1) PRIMARY KEY,
-    personName VARCHAR(40),
+    personName VARCHAR(40) not null,
     phoneNumber CHAR(8),
     cpr CHAR(10)
 )
 
 CREATE TABLE Customer(
     customerId int IDENTITY(1,1) PRIMARY KEY,
-    personName VARCHAR(40),
+    personName VARCHAR(40) not null,
     phoneNumber CHAR(8),
     cvr CHAR(8) DEFAULT null,
 )
@@ -61,7 +65,7 @@ CREATE TABLE Sale(
 )
 
 CREATE TABLE OrderLine(
-    amount int,
+    amount int default 1,
     fixedPrice DECIMAL(6,2) DEFAULT 0,
     saleNumber int FOREIGN key REFERENCES Sale(saleNumber) not null,
     priceId int FOREIGN key REFERENCES Price(priceId) not null,
